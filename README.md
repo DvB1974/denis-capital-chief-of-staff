@@ -1,1 +1,24 @@
-# denis-capital-chief-of-staff
+# Denis Capital Chief of Staff
+
+Een statische webapp die nieuws, marktdata en trendinformatie vertaalt naar acties, beslissingen, theses en triggers.
+
+## Concept
+
+De Chief of Staff is geen extra dashboard, maar een operating layer:
+
+- `Vandaag`: dagelijkse briefing en wat aandacht nodig heeft.
+- `Acties`: concrete opvolging met bron, impact en deadline.
+- `Theses`: investeringshypotheses met bewijs voor/tegen en een volgende check.
+- `Besluiten`: besluitlog met rationale, confidence en reviewdatum.
+- `Triggers`: markt- en nieuwssignalen waarop gewacht wordt.
+- `Review`: wekelijkse discipline: wat veranderde, wat moet gesloten worden, wat leren we?
+- `Roadmap`: technische integratiekaart en datamodel.
+
+De eerste versie gebruikt demo-data en `localStorage`. Integratiepunten zijn voorbereid voor Denis Capital News, CryptoPulse en de Macro/Crypto Trends Bubble Map.
+
+## Aanbevolen volgende integraties
+
+1. Publiceer uit elke bestaande site een kleine `signals.json`.
+2. Laat de Chief of Staff die read-only inlezen.
+3. Score elk signaal op bron, impact, confidence, leeftijd en overlap met actieve theses.
+4. Maak alleen acties aan wanneer een signaal een thesis, trigger of open besluit raakt.
