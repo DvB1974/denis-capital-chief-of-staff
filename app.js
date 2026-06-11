@@ -1,4 +1,9 @@
 const STORAGE_KEY = "denis-capital-chief-of-staff-v1";
+const SIGNAL_ENDPOINTS = [
+  "https://dvb1974.github.io/denis-news-reader/signals.json",
+  "https://dvb1974.github.io/cryptopulse-dashboard/signals.json",
+  "https://dvb1974.github.io/trends-bubbles/signals.json"
+];
 
 const seedState = {
   activeView: "today",
@@ -45,6 +50,7 @@ const seedState = {
       name: "Denis Capital News",
       role: "Feitenstroom",
       url: "https://dvb1974.github.io/denis-news-reader/",
+      signalsUrl: "https://dvb1974.github.io/denis-news-reader/signals.json",
       status: "Live",
       handoff: "Artikelen worden acties, theses of besluitreviews."
     },
@@ -53,6 +59,7 @@ const seedState = {
       name: "CryptoPulse",
       role: "Marktmonitor",
       url: "https://dvb1974.github.io/cryptopulse-dashboard/",
+      signalsUrl: "https://dvb1974.github.io/cryptopulse-dashboard/signals.json",
       status: "Live",
       handoff: "Prijs- en sentimentmoves worden triggers."
     },
@@ -61,6 +68,7 @@ const seedState = {
       name: "Trends Bubble Map",
       role: "Trendradar",
       url: "https://dvb1974.github.io/trends-bubbles/",
+      signalsUrl: "https://dvb1974.github.io/trends-bubbles/signals.json",
       status: "Live",
       handoff: "Groeiende clusters worden watchlist- en thesis-items."
     }
@@ -220,7 +228,13 @@ const seedState = {
       answer: "AI tokens zonder cashflow-data.",
       status: "open"
     }
-  ]
+  ],
+  integrations: {
+    status: "fallback",
+    loadedAt: null,
+    message: "Demo-signalen actief tot live exports zijn geladen.",
+    sources: []
+  }
 };
 
 let state = loadState();
@@ -238,14 +252,37 @@ function clone(value) {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return saved ? { ...clone(seedState), ...saved } : clone(seedState);
+    return migrateState(saved ? { ...clone(seedState), ...saved } : clone(seedState));
   } catch {
-    return clone(seedState);
+    return migrateState(clone(seedState));
   }
+}
+
+function migrateState(nextState) {
+  nextState.integrations = nextState.integrations || clone(seedState.integrations);
+  nextState.sources = seedState.sources.map((seedSource) => {
+    const savedSource = (nextState.sources || []).find((source) => source.id === seedSource.id || source.name === seedSource.name);
+    return { ...seedSource, ...(savedSource || {}), signalsUrl: seedSource.signalsUrl };
+  });
+  return nextState;
 }
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  lastSaved.textContent = `Opgeslagen ${new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+function savePreferences() {
+  const persisted = {
+    activeView: state.activeView,
+    actions: state.actions,
+    theses: state.theses,
+    decisions: state.decisions,
+    triggers: state.triggers,
+    review: state.review,
+    routine: state.routine
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
   lastSaved.textContent = `Opgeslagen ${new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
@@ -323,17 +360,32 @@ function renderToday() {
       </article>
     </section>
 
+    <section class="integration-panel">
+      <div>
+        <p class="eyebrow">Live signal ingest</p>
+        <h2>${state.integrations.status === "live" ? "Live exports geladen" : "Fallback actief"}</h2>
+        <p>${state.integrations.message}</p>
+      </div>
+      <div class="integration-actions">
+        ${badge(state.integrations.loadedAt || "nog niet geladen", state.integrations.status === "live" ? "green" : "blue")}
+        <button class="ghost-button" type="button" data-action="refresh-signals">Ververs signalen</button>
+      </div>
+    </section>
+
     <section class="source-rail" aria-label="Denis Capital bronnen">
       ${state.sources.map((source) => `
         <article class="source-card">
           <div>
             <div class="item-head">
               <h2>${source.name}</h2>
-              ${badge(source.status, "green")}
+              ${badge(source.status, source.status === "Live" ? "green" : source.status === "Fout" ? "red" : "blue")}
             </div>
             <p><strong>${source.role}</strong> · ${source.handoff}</p>
           </div>
-          <a class="source-link" href="${source.url}" target="_blank" rel="noopener">Open</a>
+          <div class="source-actions">
+            <a class="source-link" href="${source.url}" target="_blank" rel="noopener">Open</a>
+            <a class="source-link quiet" href="${source.signalsUrl}" target="_blank" rel="noopener">JSON</a>
+          </div>
         </article>
       `).join("")}
     </section>
@@ -405,6 +457,7 @@ function renderSignal(signal) {
           ${badge(signal.source)}
         </div>
         <p>${signal.impact}</p>
+        ${signal.url ? `<a class="inline-link" href="${signal.url}" target="_blank" rel="noopener">Bekijk bron</a>` : ""}
         ${confidence(signal.confidence)}
       </div>
       ${badge(signal.tone, tone)}
@@ -613,6 +666,92 @@ function generateBrief() {
   render();
 }
 
+function signalTone(signal) {
+  if (signal.tone) return signal.tone;
+  if (signal.type === "market") return "neutral";
+  if (signal.type === "trend") return "opportunity";
+  if (signal.impact === "high") return "risk";
+  return "neutral";
+}
+
+function normalizeSignal(raw, sourceName, index) {
+  return {
+    id: `${sourceName}-${raw.id || index}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    source: sourceName,
+    title: raw.title || "Naamloos signaal",
+    impact: raw.summary || raw.impact || "Geen samenvatting beschikbaar.",
+    tone: signalTone(raw),
+    confidence: Number(raw.confidence || 60),
+    url: raw.url || null
+  };
+}
+
+function applyLiveSignals(results) {
+  const liveSignals = [];
+  const sourceStatuses = [];
+
+  results.forEach((result) => {
+    if (result.status !== "fulfilled") {
+      sourceStatuses.push({ source: "Onbekende bron", status: "Fout" });
+      return;
+    }
+    const payload = result.value;
+    const sourceName = payload.source || "Onbekende bron";
+    const normalized = Array.isArray(payload.signals)
+      ? payload.signals.map((signal, index) => normalizeSignal(signal, sourceName, index))
+      : [];
+    liveSignals.push(...normalized);
+    sourceStatuses.push({ source: sourceName, status: normalized.length ? "Live" : "Leeg" });
+  });
+
+  if (!liveSignals.length) {
+    state.integrations = {
+      status: "fallback",
+      loadedAt: new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" }),
+      message: "Geen live signalen gevonden; demo-signalen blijven actief.",
+      sources: sourceStatuses
+    };
+    return;
+  }
+
+  state.signals = liveSignals.sort((a, b) => b.confidence - a.confidence);
+  state.sources = state.sources.map((source) => {
+    const status = sourceStatuses.find((item) => item.source === source.name);
+    return status ? { ...source, status: status.status } : source;
+  });
+  const topSignal = state.signals[0];
+  state.brief.regime = topSignal.tone === "opportunity" ? "Opportunity watch" : topSignal.tone === "risk" ? "Risk watch" : "Signal watch";
+  state.brief.summary = `${topSignal.source}: ${topSignal.title}. ${topSignal.impact}`;
+  state.brief.focus = state.signals.slice(0, 3).map((signal) => signal.title);
+  state.generatedAt = new Date().toLocaleString("nl-NL", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+  state.integrations = {
+    status: "live",
+    loadedAt: new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" }),
+    message: `${state.signals.length} signalen geladen uit ${sourceStatuses.filter((source) => source.status === "Live").length} bronnen.`,
+    sources: sourceStatuses
+  };
+}
+
+async function loadLiveSignals({ silent = false } = {}) {
+  if (!silent) {
+    state.integrations = {
+      ...state.integrations,
+      status: "loading",
+      message: "Live signalen worden geladen..."
+    };
+    render();
+  }
+  const results = await Promise.allSettled(
+    SIGNAL_ENDPOINTS.map((url) => fetch(`${url}?v=${Date.now()}`, { cache: "no-store" }).then((response) => {
+      if (!response.ok) throw new Error(`${url} gaf ${response.status}`);
+      return response.json();
+    }))
+  );
+  applyLiveSignals(results);
+  savePreferences();
+  render();
+}
+
 function addCapture() {
   const titleInput = document.querySelector("#capture-title");
   const typeInput = document.querySelector("#capture-type");
@@ -674,6 +813,7 @@ document.body.addEventListener("click", (event) => {
   const action = event.target.closest("[data-action]");
   if (action?.dataset.action === "generate-brief") generateBrief();
   if (action?.dataset.action === "quick-capture") dialog.showModal();
+  if (action?.dataset.action === "refresh-signals") loadLiveSignals();
   if (action?.dataset.action === "save-capture") addCapture();
   if (action?.dataset.action === "reset-demo") {
     state = clone(seedState);
@@ -723,3 +863,12 @@ document.body.addEventListener("click", (event) => {
 });
 
 render();
+loadLiveSignals({ silent: true }).catch(() => {
+  state.integrations = {
+    status: "fallback",
+    loadedAt: new Date().toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" }),
+    message: "Live signalen konden niet worden geladen; demo-signalen blijven actief.",
+    sources: []
+  };
+  render();
+});
