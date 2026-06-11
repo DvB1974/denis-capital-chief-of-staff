@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#10131a">
+    <title>Denis Capital Chief of Staff</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">DC</span>
+          <div>
+            <strong>Denis Capital</strong>
+            <span>Chief of Staff</span>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Hoofdnavigatie">
+          <button class="nav-item active" type="button" data-view="today">Vandaag</button>
+          <button class="nav-item" type="button" data-view="actions">Acties</button>
+          <button class="nav-item" type="button" data-view="theses">Theses</button>
+          <button class="nav-item" type="button" data-view="decisions">Besluiten</button>
+          <button class="nav-item" type="button" data-view="triggers">Triggers</button>
+          <button class="nav-item" type="button" data-view="review">Review</button>
+          <button class="nav-item" type="button" data-view="roadmap">Roadmap</button>
+        </nav>
+        <div class="sidebar-footer">
+          <span id="last-saved">Lokaal opgeslagen</span>
+          <button class="ghost-button" type="button" data-action="reset-demo">Reset demo</button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="view-kicker">Daily operating system</p>
+            <h1 id="view-title">Vandaag</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" type="button" data-action="generate-brief" aria-label="Genereer briefing" title="Genereer briefing">↻</button>
+            <button class="primary-button" type="button" data-action="quick-capture">Nieuwe input</button>
+          </div>
+        </header>
+        <section id="app" class="content" tabindex="-1"></section>
+      </main>
+    </div>
+
+    <dialog id="capture-dialog">
+      <form method="dialog" class="dialog-card">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">Nieuwe input</p>
+            <h2>Vertaal signaal naar werk</h2>
+          </div>
+          <button class="icon-button" value="cancel" aria-label="Sluiten">×</button>
+        </div>
+        <label>
+          Titel
+          <input id="capture-title" type="text" placeholder="Bijv. Fed houdt rente langer hoog">
+        </label>
+        <label>
+          Type
+          <select id="capture-type">
+            <option value="action">Actie</option>
+            <option value="thesis">Thesis</option>
+            <option value="decision">Besluit</option>
+            <option value="trigger">Trigger</option>
+          </select>
+        </label>
+        <label>
+          Context
+          <textarea id="capture-notes" rows="5" placeholder="Waarom is dit belangrijk, welke bron, welk risico of welke kans?"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button class="ghost-button" value="cancel">Annuleren</button>
+          <button class="primary-button" value="default" data-action="save-capture">Opslaan</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
