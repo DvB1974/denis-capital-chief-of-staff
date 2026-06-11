@@ -36,3 +36,9 @@ Deze app wordt iteratief beoordeeld op investeringswaarde, focus, bruikbaarheid 
 - Kritiek: het prototype had nog geen expliciete route naar echte integratie met de drie bestaande Denis Capital-sites.
 - Verbetering: Roadmap-view toegevoegd met fases, integratiestrategie en voorgesteld datamodel voor signals, actions, theses en decisions.
 - Resterend risico: zonder read-only exports uit de drie sites blijft dit een handmatig prototype.
+
+## Deployment
+
+- Chief of Staff gepubliceerd naar GitHub Pages.
+- Starter `signals.json` exports toegevoegd aan News, CryptoPulse en Trends Bubble Map.
+- Live verificatie: alle vier URLs geven HTTP 200.
