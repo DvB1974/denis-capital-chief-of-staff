@@ -286,6 +286,47 @@ button {
   text-decoration: none;
 }
 
+.source-actions,
+.integration-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.source-link.quiet {
+  color: var(--muted);
+}
+
+.integration-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid rgba(90, 167, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(90, 167, 255, 0.08);
+}
+
+.integration-panel h2 {
+  margin: 0;
+}
+
+.integration-panel p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.inline-link {
+  display: inline-flex;
+  margin-top: 8px;
+  color: var(--blue);
+  text-decoration: none;
+}
+
 .guardrail-panel {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
@@ -660,6 +701,7 @@ textarea {
 
   .overview-grid,
   .source-rail,
+  .integration-panel,
   .guardrail-panel,
   .routine-grid,
   .split,
@@ -677,6 +719,7 @@ textarea {
   }
 
   .topbar,
+  .integration-panel,
   .panel-head,
   .section-title,
   .item,
