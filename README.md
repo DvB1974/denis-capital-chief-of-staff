@@ -16,6 +16,15 @@ De Chief of Staff is geen extra dashboard, maar een operating layer:
 
 De eerste versie gebruikt demo-data en `localStorage`. Integratiepunten zijn voorbereid voor Denis Capital News, CryptoPulse en de Macro/Crypto Trends Bubble Map.
 
+De live versie leest nu read-only `signals.json` exports in vanuit de drie bestaande Denis Capital-sites. Als een bron niet bereikbaar is, valt de app terug op de ingebouwde demo-signalen.
+
+## Publicatie
+
+- Chief of Staff: https://dvb1974.github.io/denis-capital-chief-of-staff/
+- News signals: https://dvb1974.github.io/denis-news-reader/signals.json
+- CryptoPulse signals: https://dvb1974.github.io/cryptopulse-dashboard/signals.json
+- Trends signals: https://dvb1974.github.io/trends-bubbles/signals.json
+
 ## Aanbevolen volgende integraties
 
 1. Publiceer uit elke bestaande site een kleine `signals.json`.
