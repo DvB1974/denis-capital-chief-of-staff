@@ -1,0 +1,16 @@
+{
+  "schema": "denis-capital.signals.v1",
+  "source": "Denis Capital Chief of Staff",
+  "generated_at": "2026-06-11T00:00:00+02:00",
+  "signals": [
+    {
+      "id": "chief-operating-layer",
+      "title": "Chief of Staff prototype is ready",
+      "summary": "The Chief translates News, CryptoPulse and Trends Bubble Map inputs into actions, theses, decisions and triggers.",
+      "type": "system",
+      "impact": "high",
+      "confidence": 90,
+      "linked_view": "roadmap"
+    }
+  ]
+}
