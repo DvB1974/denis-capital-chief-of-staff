@@ -42,3 +42,17 @@ Deze app wordt iteratief beoordeeld op investeringswaarde, focus, bruikbaarheid 
 - Chief of Staff gepubliceerd naar GitHub Pages.
 - Starter `signals.json` exports toegevoegd aan News, CryptoPulse en Trends Bubble Map.
 - Live verificatie: alle vier URLs geven HTTP 200.
+
+## Live Ingest Update
+
+- Chief of Staff leest nu automatisch read-only signal exports uit News, CryptoPulse en Trends Bubble Map.
+- De briefing en focusknoppen worden herberekend op basis van het sterkste live signaal.
+- Fallback: als exports niet laden, blijven demo-signalen beschikbaar.
+- Live verificatie: `app.js` bevat `loadLiveSignals`; alle drie exports geven HTTP 200.
+
+## Dynamic Source Signals Update
+
+- News genereert `signals.json` uit de bestaande artikel-export met stabiele IDs, impact, confidence, tone en tags.
+- CryptoPulse genereert `signals.json` uit dashboard-assets, nieuwsfeedconfiguratie en regulatory watch.
+- Trends genereert `signals.json` uit de nieuwste Bubble Map-week met trend size, tag, signal en tone.
+- Chief-deploy uploadt voortaan gegenereerde bronexports in plaats van starter-signalen.
