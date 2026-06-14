@@ -18,12 +18,19 @@ De eerste versie gebruikt demo-data en `localStorage`. Integratiepunten zijn voo
 
 De live versie leest nu read-only `signals.json` exports in vanuit de drie bestaande Denis Capital-sites. Als een bron niet bereikbaar is, valt de app terug op de ingebouwde demo-signalen.
 
+De exports zijn nu bron-gebaseerd:
+
+- News: topartikelen uit de bestaande SQLite/exportdata, gewogen op relevantiescore.
+- CryptoPulse: dashboard-watchsignalen uit assets, nieuwsfeeds en regulatory monitor.
+- Trends: nieuwste Bubble Map-week, inclusief trendgrootte, tag, signal en tone.
+
 ## Publicatie
 
 - Chief of Staff: https://dvb1974.github.io/denis-capital-chief-of-staff/
 - News signals: https://dvb1974.github.io/denis-news-reader/signals.json
 - CryptoPulse signals: https://dvb1974.github.io/cryptopulse-dashboard/signals.json
 - Trends signals: https://dvb1974.github.io/trends-bubbles/signals.json
+- Live ingest: de Chief haalt deze drie signal exports automatisch op en valt terug op demo-data wanneer een bron niet bereikbaar is.
 
 ## Aanbevolen volgende integraties
 
